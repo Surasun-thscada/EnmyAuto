@@ -1,0 +1,6 @@
+@EnmyAuto.Api_HostAddress = http://localhost:5263
+
+GET {{EnmyAuto.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
