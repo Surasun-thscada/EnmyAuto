@@ -1,0 +1,26 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Node / Angular
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Environment & secrets
+**/appsettings.Development.json
+**/.env
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Claude
+.claude/
