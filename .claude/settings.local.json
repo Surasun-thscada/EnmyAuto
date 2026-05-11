@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Out-Null)",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Models\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Data\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Enums\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Configuration\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Models\\\\Ai\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Services\\\\Ai\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Exceptions\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Services\\\\Media\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Hubs\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Jobs\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Models\\\\Hubs\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\services\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\models\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\components\\\\smart-storyboard\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\pipes\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName)",
+      "Bash(Sort-Object FullName)",
+      "PowerShell($path = \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\"; if \\(Test-Path $path\\) { Get-ChildItem -Path $path -Recurse -Force | % { $_.FullName } | Sort-Object } else { \"Path does not exist: $path\" })",
+      "PowerShell($path = \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\"; Get-ChildItem -Path $path -Depth 0 -Force | % { $_.Name })",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\..\" -Force | Where-Object { $_.Name -match \"package\\\\.json|angular\\\\.json\" } | % { $_.FullName })",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\environments\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Services\\\\TikTok\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Models\\\\TikTok\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Services\\\\Auth\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Api\\\\Models\\\\Auth\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\components\\\\login\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\components\\\\register\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\guards\")",
+      "PowerShell(mkdir -Force \"d:\\\\Work\\\\bill\\\\EnmyAuto\\\\src\\\\EnmyAuto.Frontend\\\\src\\\\app\\\\interceptors\")",
+      "Bash(gh --version)",
+      "Bash(mkdir -p /tmp/enmyauto-pages)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"D:\\\\Work\\\\bill\\\\EnmyAuto\\\\pages\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}
