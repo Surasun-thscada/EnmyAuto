@@ -1,0 +1,143 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900
+            flex items-center justify-center px-4 py-12">
+
+  <div class="w-full max-w-md space-y-8">
+
+    <!-- Logo / Header -->
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl
+                  bg-indigo-600 shadow-lg shadow-indigo-500/40 mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 10l4.553-2.069A1 1 0 0121 8.868V15.13a1 1 0 01-1.447.9L15 14
+                   M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">EnMY Auto</h1>
+      <p class="mt-1 text-slate-400 text-sm">Sign in to your account</p>
+    </div>
+
+    <!-- Card -->
+    <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm
+                p-8 shadow-2xl space-y-6">
+
+      <!-- Error Banner -->
+      @if (errorMsg) {
+        <div class="flex items-center gap-3 rounded-xl bg-red-500/10 border border-red-500/30
+                    px-4 py-3 text-sm text-red-300">
+          <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94
+                     a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+          {{ errorMsg }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="space-y-5">
+
+        <!-- Email -->
+        <div class="space-y-1.5">
+          <label class="block text-sm font-medium text-slate-300">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            class="w-full rounded-xl border bg-slate-800/60 px-4 py-3 text-sm text-white
+                   placeholder-slate-500 outline-none transition
+                   focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            [class.border-red-500]="emailCtrl.invalid && emailCtrl.touched"
+            [class.border-white/10]="!(emailCtrl.invalid && emailCtrl.touched)"
+          />
+          @if (emailCtrl.invalid && emailCtrl.touched) {
+            <p class="text-xs text-red-400">Enter a valid email address.</p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-sm font-medium text-slate-300">Password</label>
+          </div>
+          <div class="relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              class="w-full rounded-xl border bg-slate-800/60 px-4 py-3 pr-11 text-sm text-white
+                     placeholder-slate-500 outline-none transition
+                     focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              [class.border-red-500]="passwordCtrl.invalid && passwordCtrl.touched"
+              [class.border-white/10]="!(passwordCtrl.invalid && passwordCtrl.touched)"
+            />
+            <!-- Show / hide toggle -->
+            <button type="button" (click)="showPassword = !showPassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400
+                           hover:text-slate-200 transition-colors">
+              @if (showPassword) {
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7
+                           a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878
+                           9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3
+                           3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7
+                           a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                </svg>
+              } @else {
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943
+                           9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (passwordCtrl.invalid && passwordCtrl.touched) {
+            <p class="text-xs text-red-400">Password is required.</p>
+          }
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600
+                 px-6 py-3 text-sm font-semibold text-white shadow-lg
+                 hover:bg-indigo-500 active:scale-95 transition-all
+                 disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (isLoading) {
+            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+            </svg>
+            Signing in…
+          } @else {
+            Sign in
+          }
+        </button>
+
+      </form>
+
+      <!-- Divider -->
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-white/10"></div>
+        </div>
+        <div class="relative flex justify-center text-xs">
+          <span class="bg-transparent px-3 text-slate-500">Don't have an account?</span>
+        </div>
+      </div>
+
+      <a routerLink="/register"
+         class="block w-full text-center rounded-xl border border-white/10 px-6 py-3
+                text-sm font-medium text-slate-300 hover:bg-white/5 transition-colors">
+        Create an account
+      </a>
+
+    </div>
+  </div>
+</div>

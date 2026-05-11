@@ -1,0 +1,474 @@
+<div class="min-h-full bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 py-10">
+  <div class="mx-auto max-w-2xl space-y-8">
+
+    <!-- Header -->
+    <div>
+      <h1 class="text-2xl font-extrabold text-white tracking-tight">Settings</h1>
+      <p class="mt-1 text-sm text-slate-400">Manage your account and system preferences</p>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="flex gap-1 rounded-xl bg-slate-800/60 p-1 border border-white/5 overflow-x-auto">
+      @for (tab of [
+        { id: 'profile',  label: 'Profile'     },
+        { id: 'ai',       label: 'AI Settings' },
+        { id: 'tiktok',   label: 'TikTok'      },
+        { id: 'security', label: 'Security'    },
+        { id: 'danger',   label: 'Danger Zone' }
+      ]; track tab.id) {
+        <button type="button" (click)="setTab($any(tab.id))"
+          class="flex-1 whitespace-nowrap rounded-lg py-2 px-3 text-sm font-medium transition-all duration-150"
+          [class.bg-indigo-600]="activeTab() === tab.id"
+          [class.text-white]="activeTab() === tab.id"
+          [class.shadow]="activeTab() === tab.id"
+          [class.text-slate-400]="activeTab() !== tab.id">
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PROFILE TAB
+    ══════════════════════════════════════════════ -->
+    @if (activeTab() === 'profile') {
+      <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 space-y-6">
+
+        <div class="flex items-center gap-5">
+          <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl
+                      bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-extrabold text-white shadow-lg">
+            {{ (user()?.name ?? 'U')[0].toUpperCase() }}
+          </div>
+          <div>
+            <p class="font-semibold text-white">{{ user()?.name }}</p>
+            <p class="text-sm text-slate-400">{{ user()?.email }}</p>
+            <span class="mt-1 inline-block rounded-full bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-0.5 text-xs text-indigo-300">
+              {{ user()?.quotaLimit }} quota remaining
+            </span>
+          </div>
+        </div>
+
+        <hr class="border-white/10"/>
+
+        @if (profileSuccess) {
+          <div class="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-300">
+            <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            {{ profileSuccess }}
+          </div>
+        }
+        @if (profileError) {
+          <div class="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300">{{ profileError }}</div>
+        }
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate class="space-y-5">
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300">Full Name</label>
+            <input type="text" formControlName="name"
+              class="w-full rounded-xl border bg-slate-800/60 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              [class.border-red-500]="nameCtrl.invalid && nameCtrl.touched"
+              [class.border-white/10]="!(nameCtrl.invalid && nameCtrl.touched)"/>
+            @if (nameCtrl.invalid && nameCtrl.touched) {
+              <p class="text-xs text-red-400">Name must be at least 2 characters.</p>
+            }
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300">Email Address</label>
+            <input type="email" formControlName="email"
+              class="w-full rounded-xl border border-white/5 bg-slate-800/30 px-4 py-3 text-sm text-slate-500 outline-none cursor-not-allowed"/>
+            <p class="text-xs text-slate-500">Email cannot be changed.</p>
+          </div>
+          <button type="submit" [disabled]="profileLoading"
+            class="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white
+                   shadow-lg hover:bg-indigo-500 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+            @if (profileLoading) { <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg> Saving… }
+            @else { Save Changes }
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════
+         AI SETTINGS TAB
+    ══════════════════════════════════════════════ -->
+    @if (activeTab() === 'ai') {
+      <form [formGroup]="aiForm" (ngSubmit)="saveAiSettings()" class="space-y-5">
+
+        @if (aiSuccess) {
+          <div class="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-300">
+            <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            {{ aiSuccess }}
+          </div>
+        }
+        @if (aiError) {
+          <div class="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300">{{ aiError }}</div>
+        }
+
+        <!-- Gemini API Configuration -->
+        <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/20 border border-blue-500/30">
+              <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">Gemini API Configuration</p>
+              <p class="text-xs text-slate-400">Use your own API key to increase quota</p>
+            </div>
+          </div>
+
+          <!-- API Key -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Gemini API Key</label>
+            @if (currentApiKeyDisplay) {
+              <div class="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-2.5">
+                <svg class="h-4 w-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <span class="text-sm font-mono text-green-300">{{ currentApiKeyDisplay }}</span>
+                <span class="ml-auto text-xs text-green-400">Active</span>
+              </div>
+            }
+            <input type="password" formControlName="geminiApiKey"
+              [placeholder]="currentApiKeyDisplay ? 'Enter new key to replace…' : 'AIzaSy…'"
+              class="w-full rounded-xl border border-white/10 bg-slate-800/60 px-4 py-3 text-sm text-white
+                     placeholder-slate-500 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono"/>
+            <p class="text-xs text-slate-500">Leave blank to keep using the system default API key.</p>
+          </div>
+
+          <!-- Model Selection -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">AI Model</label>
+            <div class="grid grid-cols-2 gap-2">
+              @for (model of geminiModels; track model.value) {
+                <label class="flex items-center gap-3 cursor-pointer rounded-xl border p-3.5 transition-all"
+                       [class.border-indigo-500]="aiForm.get('geminiModel')?.value === model.value"
+                       [class.bg-indigo-600/10]="aiForm.get('geminiModel')?.value === model.value"
+                       [class.border-white/10]="aiForm.get('geminiModel')?.value !== model.value">
+                  <input type="radio" formControlName="geminiModel" [value]="model.value" class="accent-indigo-500"/>
+                  <span class="text-sm text-slate-200">{{ model.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Temperature -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Temperature</label>
+              <span class="text-sm font-semibold" [class]="getTemperatureColor()">
+                {{ temperatureCtrl.value }} — {{ getTemperatureLabel() }}
+              </span>
+            </div>
+            <input type="range" formControlName="temperature"
+              min="0" max="2" step="0.1"
+              class="w-full accent-indigo-500 cursor-pointer"/>
+            <div class="flex justify-between text-xs text-slate-500">
+              <span>Precise (0)</span>
+              <span>Balanced (0.7)</span>
+              <span>Wild (2)</span>
+            </div>
+          </div>
+
+          <!-- Max Output Tokens -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Max Output Tokens</label>
+              <span class="text-sm font-semibold text-indigo-300">{{ aiForm.get('maxOutputTokens')?.value }}</span>
+            </div>
+            <input type="range" formControlName="maxOutputTokens"
+              min="100" max="8192" step="100"
+              class="w-full accent-indigo-500 cursor-pointer"/>
+            <div class="flex justify-between text-xs text-slate-500">
+              <span>100 (Short)</span>
+              <span>4096 (Long)</span>
+              <span>8192 (Max)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Preferences -->
+        <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/20 border border-violet-500/30">
+              <svg class="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">Content Preferences</p>
+              <p class="text-xs text-slate-400">Default settings when generating storyboards</p>
+            </div>
+          </div>
+
+          <!-- Language -->
+          <div class="space-y-2">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Content Language</label>
+            <div class="grid grid-cols-2 gap-2">
+              @for (lang of languages; track lang.value) {
+                <label class="flex items-center gap-3 cursor-pointer rounded-xl border p-3.5 transition-all"
+                       [class.border-indigo-500]="aiForm.get('contentLanguage')?.value === lang.value"
+                       [class.bg-indigo-600/10]="aiForm.get('contentLanguage')?.value === lang.value"
+                       [class.border-white/10]="aiForm.get('contentLanguage')?.value !== lang.value">
+                  <input type="radio" formControlName="contentLanguage" [value]="lang.value" class="accent-indigo-500"/>
+                  <span class="text-sm text-slate-200">{{ lang.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Tone -->
+          <div class="space-y-2">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Content Tone</label>
+            <div class="grid grid-cols-2 gap-2">
+              @for (tone of tones; track tone.value) {
+                <label class="flex items-center gap-3 cursor-pointer rounded-xl border p-3.5 transition-all"
+                       [class.border-indigo-500]="aiForm.get('contentTone')?.value === tone.value"
+                       [class.bg-indigo-600/10]="aiForm.get('contentTone')?.value === tone.value"
+                       [class.border-white/10]="aiForm.get('contentTone')?.value !== tone.value">
+                  <input type="radio" formControlName="contentTone" [value]="tone.value" class="accent-indigo-500"/>
+                  <span class="text-sm text-slate-200">{{ tone.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Default Category -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Default Category</label>
+            <div class="relative">
+              <select formControlName="defaultCategory"
+                class="w-full appearance-none rounded-xl border border-white/10 bg-slate-800/60 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:ring-2 focus:ring-indigo-500">
+                <option value="" class="bg-slate-800 text-slate-400">No default (always ask)</option>
+                @for (cat of categories; track cat.value) {
+                  <option [value]="cat.value" class="bg-slate-800 text-white">{{ cat.label }}</option>
+                }
+              </select>
+              <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Default Scene Count -->
+          <div class="space-y-2">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wide">Default Number of Scenes</label>
+            <div class="flex gap-2">
+              @for (count of sceneCounts; track count) {
+                <label class="flex flex-1 items-center justify-center gap-2 cursor-pointer rounded-xl border p-3 transition-all"
+                       [class.border-indigo-500]="aiForm.get('defaultSceneCount')?.value === count"
+                       [class.bg-indigo-600/10]="aiForm.get('defaultSceneCount')?.value === count"
+                       [class.border-white/10]="aiForm.get('defaultSceneCount')?.value !== count">
+                  <input type="radio" formControlName="defaultSceneCount" [value]="count" class="accent-indigo-500"/>
+                  <span class="text-sm font-semibold text-slate-200">{{ count }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Save -->
+        <button type="submit" [disabled]="aiLoading"
+          class="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white
+                 shadow-lg hover:bg-indigo-500 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (aiLoading) { <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg> Saving… }
+          @else { Save AI Settings }
+        </button>
+      </form>
+    }
+
+    <!-- ══════════════════════════════════════════════
+         TIKTOK TAB
+    ══════════════════════════════════════════════ -->
+    @if (activeTab() === 'tiktok') {
+      <div class="space-y-5">
+
+        <!-- Connection status card -->
+        <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-black border border-white/10">
+              <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">TikTok Account</p>
+              <p class="text-xs text-slate-400">Connect to enable automatic posting</p>
+            </div>
+          </div>
+
+          @if (tiktokLoading) {
+            <div class="flex items-center gap-3 py-4 text-sm text-slate-400">
+              <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+              Loading…
+            </div>
+          } @else if (tiktokStatus?.connected) {
+            <div class="space-y-4">
+              <!-- Status badge -->
+              <div class="flex items-center gap-3 rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-3">
+                <div class="h-2.5 w-2.5 rounded-full bg-green-400 animate-pulse shrink-0"></div>
+                <span class="text-sm font-medium text-green-300">Connected</span>
+              </div>
+              <!-- Details grid -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-slate-800/60 p-4 space-y-1">
+                  <p class="text-xs text-slate-500 uppercase tracking-wide">Account ID</p>
+                  <p class="text-sm font-mono text-slate-300">{{ tiktokStatus?.accountId?.slice(0, 8) }}…</p>
+                </div>
+                <div class="rounded-xl bg-slate-800/60 p-4 space-y-1">
+                  <p class="text-xs text-slate-500 uppercase tracking-wide">Connected Since</p>
+                  <p class="text-sm text-slate-300">{{ tiktokStatus?.connectedAt | date:'dd MMM yyyy' }}</p>
+                </div>
+                <div class="col-span-2 rounded-xl bg-slate-800/60 p-4 space-y-1">
+                  <p class="text-xs text-slate-500 uppercase tracking-wide">Token Expires</p>
+                  <p class="text-sm text-slate-300">{{ tiktokStatus?.tokenExpiresAt | date:'dd MMM yyyy, HH:mm' }}</p>
+                </div>
+              </div>
+              @if (tiktokError) { <p class="text-sm text-red-400">{{ tiktokError }}</p> }
+              <div class="flex gap-3">
+                <button type="button" (click)="connectTikTok()"
+                  class="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 transition-colors">
+                  Re-authorize
+                </button>
+                <button type="button" (click)="disconnectTikTok()" [disabled]="tiktokDisconnecting"
+                  class="flex items-center gap-2 rounded-xl border border-red-500/40 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50">
+                  @if (tiktokDisconnecting) { <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg> }
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              <div class="flex items-center gap-3 rounded-xl bg-slate-800/60 border border-white/10 px-4 py-3">
+                <div class="h-2.5 w-2.5 rounded-full bg-slate-500 shrink-0"></div>
+                <span class="text-sm text-slate-400">No TikTok account connected</span>
+              </div>
+              @if (tiktokError) { <p class="text-sm text-red-400">{{ tiktokError }}</p> }
+              <button type="button" (click)="connectTikTok()"
+                class="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg hover:bg-slate-100 active:scale-95 transition-all">
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+                </svg>
+                Connect with TikTok
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Info box -->
+        <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-5 space-y-3">
+          <p class="text-sm font-semibold text-indigo-300">What connecting enables</p>
+          <ul class="space-y-2">
+            @for (item of ['Auto-post videos directly to TikTok', 'Schedule posts at optimal times', 'Track video performance in Campaigns']; track item) {
+              <li class="flex items-center gap-2 text-sm text-slate-300">
+                <svg class="h-4 w-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                {{ item }}
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════
+         SECURITY TAB
+    ══════════════════════════════════════════════ -->
+    @if (activeTab() === 'security') {
+      <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 space-y-6">
+        <div>
+          <h2 class="text-base font-semibold text-white">Change Password</h2>
+          <p class="mt-0.5 text-sm text-slate-400">You'll stay logged in after changing your password.</p>
+        </div>
+        @if (passwordSuccess) {
+          <div class="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-300">
+            <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            {{ passwordSuccess }}
+          </div>
+        }
+        @if (passwordError) {
+          <div class="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300">{{ passwordError }}</div>
+        }
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate class="space-y-5">
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300">Current Password</label>
+            <div class="relative">
+              <input [type]="showCurrentPw ? 'text' : 'password'" formControlName="currentPassword" placeholder="••••••••"
+                class="w-full rounded-xl border bg-slate-800/60 px-4 py-3 pr-11 text-sm text-white placeholder-slate-500 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                [class.border-red-500]="currentPwCtrl.invalid && currentPwCtrl.touched"
+                [class.border-white/10]="!(currentPwCtrl.invalid && currentPwCtrl.touched)"/>
+              <button type="button" (click)="showCurrentPw = !showCurrentPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+            @if (currentPwCtrl.invalid && currentPwCtrl.touched) { <p class="text-xs text-red-400">Current password is required.</p> }
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300">New Password</label>
+            <div class="relative">
+              <input [type]="showNewPw ? 'text' : 'password'" formControlName="newPassword" placeholder="Min. 8 characters"
+                class="w-full rounded-xl border bg-slate-800/60 px-4 py-3 pr-11 text-sm text-white placeholder-slate-500 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                [class.border-red-500]="newPwCtrl.invalid && newPwCtrl.touched"
+                [class.border-white/10]="!(newPwCtrl.invalid && newPwCtrl.touched)"/>
+              <button type="button" (click)="showNewPw = !showNewPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+            @if (newPwCtrl.value) {
+              <div class="space-y-1 pt-1">
+                <div class="flex gap-1">@for (i of [1,2,3,4]; track i) { <div class="h-1 flex-1 rounded-full transition-colors duration-300" [class]="getStrengthColor(i)"></div> }</div>
+                <p class="text-xs text-slate-400">Strength: {{ getStrengthLabel() }}</p>
+              </div>
+            }
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-slate-300">Confirm New Password</label>
+            <input [type]="showNewPw ? 'text' : 'password'" formControlName="confirmPassword" placeholder="••••••••"
+              class="w-full rounded-xl border bg-slate-800/60 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              [class.border-red-500]="passwordMismatch" [class.border-white/10]="!passwordMismatch"/>
+            @if (passwordMismatch) { <p class="text-xs text-red-400">Passwords do not match.</p> }
+          </div>
+          <button type="submit" [disabled]="passwordLoading"
+            class="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-indigo-500 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+            @if (passwordLoading) { <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg> Updating… }
+            @else { Update Password }
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════
+         DANGER ZONE TAB
+    ══════════════════════════════════════════════ -->
+    @if (activeTab() === 'danger') {
+      <div class="rounded-2xl border border-red-500/30 bg-red-500/5 p-8 space-y-6">
+        <div>
+          <h2 class="text-base font-semibold text-red-400">Danger Zone</h2>
+          <p class="mt-0.5 text-sm text-slate-400">Permanent actions that cannot be undone.</p>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-slate-800/40 p-5 space-y-4">
+          <div>
+            <p class="text-sm font-semibold text-white">Delete Account</p>
+            <p class="text-sm text-slate-400 mt-0.5">Deletes your account, all storyboards, videos, and campaigns permanently.</p>
+          </div>
+          @if (deleteError) { <div class="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300">{{ deleteError }}</div> }
+          <div class="space-y-2">
+            <label class="block text-xs text-slate-400">Type <span class="font-mono font-bold text-red-400">DELETE</span> to confirm</label>
+            <input type="text" [(ngModel)]="deleteConfirmText" [ngModelOptions]="{ standalone: true }" placeholder="DELETE"
+              class="w-full rounded-xl border border-white/10 bg-slate-800/60 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:ring-2 focus:ring-red-500"/>
+          </div>
+          <button type="button" (click)="deleteAccount()" [disabled]="deleteConfirmText !== 'DELETE' || deleteLoading"
+            class="flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white hover:bg-red-500 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+            @if (deleteLoading) { <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg> Deleting… }
+            @else { Delete My Account }
+          </button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
